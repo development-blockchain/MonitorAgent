@@ -33,7 +33,7 @@ func TestKafkaHook(t *testing.T) {
 	t.Logf("logger.Level: %v", logger.Level)
 
 	// Add topics
-	l := logger.WithField("topics", []string{"topic_1"})
+	l := logger.WithField("topics", []string{"nodelog"})
 
 	l.Debug("This must not be logged")
 

@@ -63,7 +63,7 @@ func (hook *KafkaHook) Levels() []logrus.Level {
 
 func (hook *KafkaHook) Fire(entry *logrus.Entry) error {
 	// Check time for partition key
-	var partitionKey sarama.ByteEncoder
+	var partitionKey sarama.StringEncoder
 
 	// Get field time
 	t, _ := entry.Data["time"].(time.Time)
@@ -75,7 +75,7 @@ func (hook *KafkaHook) Fire(entry *logrus.Entry) error {
 		return err
 	}
 
-	partitionKey = sarama.ByteEncoder(b)
+	partitionKey = sarama.StringEncoder(hook.id)
 
 	// Check topics
 	var topics []string

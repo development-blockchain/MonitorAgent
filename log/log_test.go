@@ -2,6 +2,7 @@ package log
 
 import (
 	"testing"
+	"time"
 )
 
 func TestLocalSystemLogger(T *testing.T) {
@@ -11,19 +12,25 @@ func TestLocalSystemLogger(T *testing.T) {
 		Level: "debug",
 	}
 	InitLog(config)
-	Info("this is info")
-	Debug("this is debug")
-	Error("this is error")
+	l := Entry()
+	l.Info("this is info")
+	l.Debug("this is debug")
+	l.Error("this is error")
 }
 
 func TestKafkaLogger(T *testing.T) {
 	config := LogConfig{
-		Kafka: nil,
+		Kafka: &KafkaConfig{
+			Brokers: []string{"localhost:9092"},
+			Topic:   "nodelog",
+		},
 		Path:  "logs",
 		Level: "debug",
 	}
 	InitLog(config)
-	Info("this is info")
-	Debug("this is debug")
-	Error("this is error")
+	l := Entry()
+	l.Info("this is info")
+	l.Debug("this is debug")
+	l.Error("this is error")
+	time.Sleep(time.Second)
 }
