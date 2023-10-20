@@ -9,8 +9,8 @@ import (
 func TestKafkaHook(t *testing.T) {
 	// Create a new KafkaHook
 	hook, err := NewKafkaHook(
-		"kh",
-		[]logrus.Level{logrus.InfoLevel, logrus.WarnLevel, logrus.ErrorLevel},
+		"node_11::33::33",
+		[]logrus.Level{logrus.InfoLevel, logrus.DebugLevel, logrus.ErrorLevel},
 		&logrus.JSONFormatter{},
 		[]string{"127.0.0.1:9092"},
 	)
@@ -21,6 +21,7 @@ func TestKafkaHook(t *testing.T) {
 
 	// Create a new logrus.Logger
 	logger := logrus.New()
+	logger.SetLevel(logrus.InfoLevel)
 
 	// Add hook to logger
 	logger.Hooks.Add(hook)

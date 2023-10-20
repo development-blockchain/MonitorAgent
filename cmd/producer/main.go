@@ -13,6 +13,7 @@ var (
 )
 
 func main() {
+	flag.Parse()
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll
 	config.Producer.Return.Successes = true
