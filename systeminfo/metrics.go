@@ -11,6 +11,7 @@ import (
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
 	"os"
+	"strings"
 )
 
 var (
@@ -59,11 +60,15 @@ func Metrics() {
 	hostCpuLoad.WithLabelValues(hostname).Set(info.CPU.CPULoad)
 
 	for _, diskUsage := range info.Storage {
+		if strings.HasPrefix(diskUsage.Path, "/snap") {
+			continue
+		}
 		diskUsageTotal.WithLabelValues(hostname, diskUsage.Path).Set(float64(diskUsage.Total))
 		diskUsageFree.WithLabelValues(hostname, diskUsage.Path).Set(float64(diskUsage.Free))
 		diskUsageUsed.WithLabelValues(hostname, diskUsage.Path).Set(float64(diskUsage.Used))
 		diskUsageUsedPercent.WithLabelValues(hostname, diskUsage.Path).Set(float64(diskUsage.UsedPercent))
 	}
+	//fmt.Printf(Prometheus(info))
 }
 
 // SystemInfo - export Data structure form of the SystemInfo
