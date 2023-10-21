@@ -1,8 +1,12 @@
 package main
 
-import "github.com/develope/MonitorAgent/log"
+import (
+	"github.com/develope/MonitorAgent/log"
+	"github.com/develope/MonitorAgent/metrics"
+)
 
 func main() {
+	metrics.StartMetrics(9000)
 	config := log.LogConfig{
 		//Kafka: &log.KafkaConfig{
 		//	Brokers: []string{"localhost:9092"},
