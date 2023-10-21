@@ -26,10 +26,10 @@ var (
 	hostCpuCount   = metrics.NewRegisteredGauge(subnamespace, "host_cpu_count", []string{"hostname"})
 	hostCpuLoad    = metrics.NewRegisteredGauge(subnamespace, "host_cpu_load", []string{"hostname"})
 
-	diskUsageTotal       = metrics.NewRegisteredGauge(subnamespace, "disk_usage_total", []string{"hostname", "path"})
-	diskUsageFree        = metrics.NewRegisteredGauge(subnamespace, "disk_usage_free", []string{"hostname", "path"})
-	diskUsageUsed        = metrics.NewRegisteredGauge(subnamespace, "disk_usage_used", []string{"hostname", "path"})
-	diskUsageUsedPercent = metrics.NewRegisteredGauge(subnamespace, "disk_usage_used_percent", []string{"hostname", "path"})
+	diskUsageTotal       = metrics.NewRegisteredGauge(subnamespace, "disk_space_total", []string{"hostname", "path"})
+	diskUsageFree        = metrics.NewRegisteredGauge(subnamespace, "disk_space_free", []string{"hostname", "path"})
+	diskUsageUsed        = metrics.NewRegisteredGauge(subnamespace, "disk_space_used", []string{"hostname", "path"})
+	diskUsageUsedPercent = metrics.NewRegisteredGauge(subnamespace, "disk_space_used_percent", []string{"hostname", "path"})
 )
 
 type CPUInformation struct {
