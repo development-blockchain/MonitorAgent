@@ -1,5 +1,5 @@
 # MonitorAgent
-An agent for node monitor.
+本模块提供了系统信息的自动监控，以及提供了可接入kafka的日志模块.
 
 # 如何运行
 ```
@@ -81,4 +81,39 @@ process_cpu_seconds_total 0.01
 # HELP process_max_fds Maximum number of open file descriptors.
 # TYPE process_max_fds gauge
 ...
+```
+
+# 日志模块如何使用
+参考示例代码，日志模块一定会将日志存储到本地文件，如果配置了kafka，那么同时还会将日志发往kafka对应的topic中.
+```go
+func TestLocalSystemLogger(T *testing.T) {
+	config := LogConfig{
+		Kafka: nil,
+		Path:  "logs",
+		Level: "debug",
+	}
+	InitLog(config)
+	l := Entry()
+	l.Info("this is info")
+	l.Debug("this is debug")
+	l.Error("this is error")
+}
+
+func TestKafkaLogger(T *testing.T) {
+	config := LogConfig{
+		Kafka: &KafkaConfig{
+			Brokers: []string{"localhost:9092"},
+			Topic:   "nodelog",
+		},
+		Path:  "logs",
+		Level: "debug",
+	}
+	InitLog(config)
+	l := Entry()
+	l.Info("this is info")
+	l.Debug("this is debug")
+	l.Error("this is error")
+	time.Sleep(time.Second)
+}
+
 ```
