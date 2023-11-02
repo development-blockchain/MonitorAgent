@@ -3,6 +3,7 @@ package systeminfo
 import (
 	"bytes"
 	"fmt"
+	"github.com/develope/MonitorAgent/common"
 	"github.com/develope/MonitorAgent/metrics"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -10,26 +11,29 @@ import (
 	"github.com/shirou/gopsutil/load"
 	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/net"
-	"os"
 	"strings"
 )
 
 var (
 	subnamespace   = "systeminfo"
-	memTotal       = metrics.NewRegisteredGauge(subnamespace, "mem_total", []string{"hostname"})
-	memAvailable   = metrics.NewRegisteredGauge(subnamespace, "mem_available", []string{"hostname"})
-	memUsed        = metrics.NewRegisteredGauge(subnamespace, "mem_used", []string{"hostname"})
-	memUsedPercent = metrics.NewRegisteredGauge(subnamespace, "mem_used_percent", []string{"hostname"})
+	nodeIdentifier = metrics.NodeIdentifier
 
-	hostUptime     = metrics.NewRegisteredGauge(subnamespace, "host_uptime", []string{"hostname"})
-	hostProcessors = metrics.NewRegisteredGauge(subnamespace, "host_processor_count", []string{"hostname"})
-	hostCpuCount   = metrics.NewRegisteredGauge(subnamespace, "host_cpu_count", []string{"hostname"})
-	hostCpuLoad    = metrics.NewRegisteredGauge(subnamespace, "host_cpu_load", []string{"hostname"})
+	memTotal       = metrics.NewRegisteredGauge(subnamespace, "mem_total", []string{nodeIdentifier})
+	memAvailable   = metrics.NewRegisteredGauge(subnamespace, "mem_available", []string{nodeIdentifier})
+	memUsed        = metrics.NewRegisteredGauge(subnamespace, "mem_used", []string{nodeIdentifier})
+	memUsedPercent = metrics.NewRegisteredGauge(subnamespace, "mem_used_percent", []string{nodeIdentifier})
 
-	diskUsageTotal       = metrics.NewRegisteredGauge(subnamespace, "disk_space_total", []string{"hostname", "path"})
-	diskUsageFree        = metrics.NewRegisteredGauge(subnamespace, "disk_space_free", []string{"hostname", "path"})
-	diskUsageUsed        = metrics.NewRegisteredGauge(subnamespace, "disk_space_used", []string{"hostname", "path"})
-	diskUsageUsedPercent = metrics.NewRegisteredGauge(subnamespace, "disk_space_used_percent", []string{"hostname", "path"})
+	hostUptime     = metrics.NewRegisteredGauge(subnamespace, "host_uptime", []string{nodeIdentifier})
+	hostProcessors = metrics.NewRegisteredGauge(subnamespace, "host_processor_count", []string{nodeIdentifier})
+	hostCpuCount   = metrics.NewRegisteredGauge(subnamespace, "host_cpu_count", []string{nodeIdentifier})
+	hostCpuLoad    = metrics.NewRegisteredGauge(subnamespace, "host_cpu_load", []string{nodeIdentifier})
+
+	diskUsageTotal       = metrics.NewRegisteredGauge(subnamespace, "disk_space_total", []string{nodeIdentifier, "path"})
+	diskUsageFree        = metrics.NewRegisteredGauge(subnamespace, "disk_space_free", []string{nodeIdentifier, "path"})
+	diskUsageUsed        = metrics.NewRegisteredGauge(subnamespace, "disk_space_used", []string{nodeIdentifier, "path"})
+	diskUsageUsedPercent = metrics.NewRegisteredGauge(subnamespace, "disk_space_used_percent", []string{nodeIdentifier, "path"})
+
+	ipValue = metrics.NewRegisteredGauge(subnamespace, "extern_ip", []string{nodeIdentifier, "extern_ip"})
 )
 
 type CPUInformation struct {
@@ -38,16 +42,18 @@ type CPUInformation struct {
 }
 
 type SystemInformation struct {
-	Memory  mem.VirtualMemoryStat `json:"memory"`
-	Host    host.InfoStat         `json:"host"`
-	Load    load.AvgStat          `json:"load"`
-	CPU     CPUInformation        `json:"cpu"`
-	Storage []disk.UsageStat      `json:"storage"`
-	Network []net.IOCountersStat  `json:"network"`
+	Memory   mem.VirtualMemoryStat `json:"memory"`
+	Host     host.InfoStat         `json:"host"`
+	Load     load.AvgStat          `json:"load"`
+	CPU      CPUInformation        `json:"cpu"`
+	Storage  []disk.UsageStat      `json:"storage"`
+	Network  []net.IOCountersStat  `json:"network"`
+	ExternIp string                `json:"ip"`
 }
 
 func Metrics() {
-	hostname, _ := os.Hostname()
+	hostname := common.GetHostName()
+
 	info := SystemInfo()
 	memTotal.WithLabelValues(hostname).Set(float64(info.Memory.Total))
 	memAvailable.WithLabelValues(hostname).Set(float64(info.Memory.Available))
@@ -68,7 +74,9 @@ func Metrics() {
 		diskUsageUsed.WithLabelValues(hostname, diskUsage.Path).Set(float64(diskUsage.Used))
 		diskUsageUsedPercent.WithLabelValues(hostname, diskUsage.Path).Set(float64(diskUsage.UsedPercent))
 	}
-	//fmt.Printf(Prometheus(info))
+	if ip, err := common.GetExternal(); err == nil {
+		ipValue.WithLabelValues(ip).Set(0)
+	}
 }
 
 // SystemInfo - export Data structure form of the SystemInfo

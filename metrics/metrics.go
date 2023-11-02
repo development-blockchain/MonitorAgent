@@ -2,13 +2,15 @@ package metrics
 
 import (
 	"fmt"
+	"github.com/develope/MonitorAgent/common"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 )
 
 const (
-	Namespace = "monitor"
+	Namespace      = "monitor"
+	NodeIdentifier = "nodename"
 )
 
 func NewRegisteredCounterVec(subname string, name string, labels []string) *prometheus.CounterVec {
@@ -63,8 +65,9 @@ func NewRegisteredSummary(subname string, name string, labels []string) *prometh
 	return summaryVec
 }
 
-func StartMetrics(port int) {
+func StartMetrics(nodeName string, port int) {
 	addr := fmt.Sprintf(":%d", port)
+	common.SetHostName(nodeName)
 	http.Handle("/metrics", promhttp.Handler())
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {

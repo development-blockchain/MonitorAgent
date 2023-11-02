@@ -7,16 +7,17 @@ import (
 )
 
 func main() {
-	go metrics.StartMetrics(9000)
+	go metrics.StartMetrics("node1", 9000)
 
 	mon := systeminfo.SystemMonitor{}
 	mon.Start()
 
 	config := log.LogConfig{
-		//Kafka: &log.KafkaConfig{
-		//	Brokers: []string{"localhost:9092"},
-		//	Topic:   "topic_1",
-		//},
+		Kafka: &log.KafkaConfig{
+			Brokers: []string{"127.0.0.1:9092"},
+			//Brokers: []string{"47.104.157.94:9092"},
+			Topic: "nodelog",
+		},
 		Path:  "logs",
 		Level: "debug",
 	}

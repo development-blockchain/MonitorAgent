@@ -1,6 +1,7 @@
 package systeminfo
 
 import (
+	"github.com/develope/MonitorAgent/log"
 	"sync"
 	"time"
 )
@@ -31,7 +32,9 @@ func (m *SystemMonitor) monitor() {
 		for {
 			select {
 			case <-ticker.C:
+				l := log.Entry()
 				Metrics()
+				l.Info("finish metrics one time")
 
 			case <-m.quit:
 				return

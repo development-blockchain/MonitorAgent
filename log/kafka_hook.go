@@ -3,8 +3,8 @@ package log
 import (
 	"errors"
 	"github.com/IBM/sarama"
+	"github.com/develope/MonitorAgent/common"
 	"github.com/sirupsen/logrus"
-	"log"
 	"time"
 )
 
@@ -23,11 +23,12 @@ type KafkaHook struct {
 }
 
 // Create a new KafkaHook.
-func NewKafkaHook(id string, levels []logrus.Level, formatter logrus.Formatter, brokers []string) (*KafkaHook, error) {
+func NewKafkaHook(levels []logrus.Level, formatter logrus.Formatter, brokers []string) (*KafkaHook, error) {
 	kafkaConfig := sarama.NewConfig()
 	kafkaConfig.Producer.RequiredAcks = sarama.WaitForLocal       // Only wait for the leader to ack
 	kafkaConfig.Producer.Compression = sarama.CompressionSnappy   // Compress messages
 	kafkaConfig.Producer.Flush.Frequency = 500 * time.Millisecond // Flush batches every 500ms
+	kafkaConfig.Net.ResolveCanonicalBootstrapServers = true
 
 	producer, err := sarama.NewAsyncProducer(brokers, kafkaConfig)
 
@@ -38,13 +39,13 @@ func NewKafkaHook(id string, levels []logrus.Level, formatter logrus.Formatter, 
 	// We will just log to STDOUT if we're not able to produce messages.
 	// Note: messages will only be returned here after all retry attempts are exhausted.
 	go func() {
-		for err := range producer.Errors() {
-			log.Printf("Failed to send log entry to kafka: %v\n", err)
+		for _ = range producer.Errors() {
+			//log.Printf("Failed to send log entry to kafka: %v\n", err)
 		}
 	}()
 
 	hook := &KafkaHook{
-		id,
+		"",
 		levels,
 		formatter,
 		producer,
@@ -75,7 +76,7 @@ func (hook *KafkaHook) Fire(entry *logrus.Entry) error {
 		return err
 	}
 
-	partitionKey = sarama.StringEncoder(hook.id)
+	partitionKey = sarama.StringEncoder(common.GetHostName())
 
 	// Check topics
 	var topics []string

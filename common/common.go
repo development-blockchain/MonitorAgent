@@ -3,7 +3,24 @@ package common
 import (
 	"bytes"
 	"net/http"
+	"os"
 )
+
+var (
+	nodename = ""
+)
+
+func SetHostName(name string) {
+	nodename = name
+}
+
+func GetHostName() string {
+	if nodename == "" {
+		hostname, _ := os.Hostname()
+		return hostname
+	}
+	return nodename
+}
 
 func GetExternal() (string, error) {
 	resp, err := http.Get("http://myexternalip.com/raw")

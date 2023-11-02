@@ -2,9 +2,6 @@ package log
 
 import (
 	"fmt"
-	"github.com/develope/MonitorAgent/common"
-	"os"
-	"strings"
 	"time"
 
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
@@ -82,13 +79,7 @@ func localFilesystemLogger(log *logrus.Logger, logPath string) {
 }
 
 func kafkaLogger(log *logrus.Logger, kafkaConfig *KafkaConfig) {
-	var nodeid, _ = os.Hostname()
-	if nodeip, err := common.GetExternal(); err == nil {
-		nodeid = fmt.Sprintf("node_%s", strings.Replace(nodeip, ".", "_", -1))
-	}
-	fmt.Printf("kafkalogger node id is %s\n", nodeid)
 	hook, err := NewKafkaHook(
-		nodeid,
 		[]logrus.Level{logrus.InfoLevel, logrus.DebugLevel, logrus.ErrorLevel},
 		&logrus.JSONFormatter{TimestampFormat: "2006-01-2 15:04:05.000"},
 		kafkaConfig.Brokers,
