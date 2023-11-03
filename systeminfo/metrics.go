@@ -75,7 +75,7 @@ func Metrics() {
 		diskUsageUsedPercent.WithLabelValues(hostname, diskUsage.Path).Set(float64(diskUsage.UsedPercent))
 	}
 	if ip, err := common.GetExternal(); err == nil {
-		ipValue.WithLabelValues(ip).Set(0)
+		ipValue.WithLabelValues(hostname, ip).Set(0)
 	}
 }
 
