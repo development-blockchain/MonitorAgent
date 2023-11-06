@@ -74,14 +74,14 @@ func logWriter(logPath string) *rotatelogs.RotateLogs {
 }
 
 func localFilesystemLogger(log *logrus.Logger, logPath string) {
-	lfHook := lfshook.NewHook(logWriter(logPath), &logrus.TextFormatter{FullTimestamp: true, TimestampFormat: "2006-01-2 15:04:05.000"})
+	lfHook := lfshook.NewHook(logWriter(logPath), &logrus.TextFormatter{FullTimestamp: true, TimestampFormat: "2006-01-02 15:04:05.000"})
 	log.AddHook(lfHook)
 }
 
 func kafkaLogger(log *logrus.Logger, kafkaConfig *KafkaConfig) {
 	hook, err := NewKafkaHook(
 		[]logrus.Level{logrus.InfoLevel, logrus.DebugLevel, logrus.ErrorLevel},
-		&logrus.JSONFormatter{TimestampFormat: "2006-01-2 15:04:05.000"},
+		&logrus.JSONFormatter{TimestampFormat: "2006-01-02 15:04:05.000"},
 		kafkaConfig.Brokers,
 	)
 	if err != nil {

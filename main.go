@@ -24,6 +24,8 @@ func demoNode() {
 			metrics.UpdatePeerCount(rand.Intn(10))
 			idx := int(height.Int64()) % len(methods)
 			metrics.UpdateRestHandler(methods[idx])
+			l.Debug("demo node info")
+			l.Error("demo node info")
 			l.Info("demo node info")
 		}
 	}
@@ -46,7 +48,7 @@ func main() {
 	}
 	log.InitLog(config)
 	l := log.Entry()
-	l.Println("xChain")
+	l.Info("xChain")
 	go demoNode()
 
 	ch := make(chan interface{})
